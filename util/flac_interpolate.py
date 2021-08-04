@@ -56,7 +56,8 @@ def interpolate(frame, field):
     if field == 'phase':
         ## phase
         # read marker location, age and phase
-        mx, mz, mage, mphase, *unused = fl.read_markers(frame)
+        mx, mz, mage, mphase, idm, a1, a2, ntriag = fl.read_markers(frame)
+        #mx, mz, mage, mphase, *unused = fl.read_markers(frame)
         mx, mz, mphase = excluding(mx, mz, mphase, xmin-padding, xmax+padding, zmin-padding, zmax+padding)
         ph = flac.nearest_neighbor_interpolation2d(mx, mz, mphase, x, z)
         f = ph.astype(np.float32)
