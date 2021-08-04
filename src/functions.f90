@@ -55,6 +55,7 @@ end function stressI
 !================================
 ! Second invariant of stress
 function stressII(iz,ix)
+!$ACC routine seq
 use arrays
 include 'precision.inc'
 

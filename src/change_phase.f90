@@ -120,7 +120,7 @@ do kk = 1 , nmarkers
         !    mark_phase(kk) = kweakmc
         !endif
 
-    case (kmant1, kmant2)
+    case (kmant1)
         ! subuducted oceanic crust below mantle, mantle is serpentinized
         if(depth > max_basalt_depth) cycle
 
@@ -142,6 +142,9 @@ do kk = 1 , nmarkers
                 exit
             endif
         enddo
+    case (kmant2)
+        ! dry mantle (depltetd mantle)
+        ! future work : phase diagram ?
     case (kocean0, kocean1, kocean2)
         ! basalt -> eclogite
         ! phase change pressure
@@ -152,6 +155,16 @@ do kk = 1 , nmarkers
         !$OMP atomic write
         itmp(j,i) = 1
         mark_phase(kk) = keclg
+    case (kocean3)
+        ! basalt -> eclogite
+        ! phase change pressure
+        trpres = -0.3d9 + 2.2d6*tmpr
+        press = mantle_density * g * depth
+        if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres) cycle
+        !$ACC atomic write
+        !$OMP atomic write
+        itmp(j,i) = 1
+        mark_phase(kk) = keclg1
     case (kserp)
         ! dehydration, serpentinite -> hydrated mantle
         ! Phase diagram taken from Ulmer and Trommsdorff, Nature, 1995

@@ -289,6 +289,8 @@ subroutine velbc (i,numbp,x,mid_j)
   double precision :: fun
   integer :: ii1, jj1
 
+!!sec_year,dt step 
+
   fun =  bca(i) + bcb(i)*x + bcc(i)*x*x   & 
        + (bcd(i)*cos (pi2*bce(i)*x) + bcf(i)*sin (pi2*bcg(i)*x))    &
        *exp(-((x-bci(i))*bch(i))**2)

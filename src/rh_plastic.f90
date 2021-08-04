@@ -244,8 +244,10 @@ end
 
 subroutine pre_plast (i,j,coh,phi,psi,hardn)
 !$ACC routine seq
+!$ACC routine (stressII) seq
 use arrays
 use params
+use phases
 include 'precision.inc'
 
 pls_curr = aps(j,i)
@@ -288,6 +290,12 @@ do iph = 1, nphase
     psi = psi + phase_ratio(iph,j,i) * d
     hardn = hardn + phase_ratio(iph,j,i) * h
 
+    if (iph == karc1 .and. stressII(j,i) > 1d2) then
+        phi = phi * 0.2
+    endif
+    if (iph == kcont2 .and. stressII(j,i) > 1d2) then
+        phi = phi * 0.2
+    endif
 enddo
 
 phi = 1 / phi
