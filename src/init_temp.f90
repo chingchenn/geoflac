@@ -44,9 +44,9 @@ case (2)
             if (iph_col_trans(n-1) == 1) cycle
         endif
 
-        if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2   &
-            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2  &
-            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2) then
+        if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
+            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
+            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
             !! Oceanic geotherm (half space cooling model)
             do i = ixtb1(n), ixtb2(n)
                 age = age_1(n)
@@ -227,7 +227,7 @@ subroutine sidewalltemp(i1, i2)
       n = nzone_age
   endif
 
-  if(iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2) then
+  if(iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3 ) then
       !! Oceanic geotherm (half space cooling model)
       !$ACC parallel loop collapse(2) async(1)
       do i = i1, i2
