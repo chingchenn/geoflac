@@ -34,9 +34,9 @@ case (2)
     cond_m = 3.3d0
     dens_c = 2700.d0
     dens_m = 3300.d0
-    cond1 = 15.0
-    cond2 =  6.0
-    depth = 40.0
+    cond1 = 20.0
+    cond2 = 6.0
+    depth = 45.0
     pi = 3.14159d0
     diffusivity = 1.d-6
     do n = 1, nzone_age
@@ -209,9 +209,9 @@ subroutine sidewalltemp(i1, i2)
   cond_m = 3.3d0
   dens_c = 2700.d0
   dens_m = 3300.d0
-  cond1 = 15.0
+  cond1 = 20.0
   cond2 =  6.0
-  depth = 40.0
+  depth = 45.0
   pi = 3.14159d0
   diffusivity = 1.d-6
 
