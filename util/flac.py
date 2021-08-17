@@ -230,14 +230,14 @@ class Flac(object):
         return fmelt
 
 
-    def read_chamber(self, frame):
+    def read_fmagma(self, frame):
         columns = 1
-        f = open('chamber.0')
+        f = open('fmagma.0')
         offset = (frame-1) * columns * self.nelements * sizeoffloat
         f.seek(offset)
-        chamber = self._read_data(f, columns, count=self.nelements)
-        self._reshape_elemental_fields(chamber)
-        return chamber
+        fmagma = self._read_data(f, columns, count=self.nelements)
+        self._reshape_elemental_fields(fmagma)
+        return fmagma
 
 
     def read_diss(self, frame):
@@ -916,17 +916,27 @@ def printing(*args, **kwd):
 
 
 
-## This is an example on how to use this module.
 ## Before running this module, 'cd' to a directory containing the flac data.
 if __name__ == '__main__':
+    import sys
+
+    if (len(sys.argv) < 3):
+        print('''Usage: flac.py frame fieldname''')
+        sys.exit(1)
 
     fl = Flac()
 
-    # read the last record of the mesh and temperature
-    x, z = fl.read_mesh(fl.nrec-1)
-    T = fl.read_temperature(fl.nrec-1)
+    frame = int(sys.argv[1])
+    if frame == -1: frame = fl.nrec
 
-    # print (x, z, T) to screen
-    printing(x, z, T)
+    #results = []
+    fieldname = sys.argv[2]
+    fn = fl.__getattribute__('read_' + fieldname)
+    field = fn(frame)
+    #results.append(field)
 
-    print('# time =', fl.time[fl.nrec-1], 'Myrs')
+    # print to screen
+    printing(field)
+
+    #print('# time =', fl.time[fl.nrec-1], 'Myrs')
+

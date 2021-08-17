@@ -49,7 +49,7 @@ sshrheat = 0
 dtopo = 0
 extrusion = 0
 fmelt = 0
-chamber = 0
+fmagma = 0
 e2sr = 1d-16
 se2sr = 1d-16
 
@@ -108,7 +108,7 @@ include 'precision.inc'
 !$ACC update device(x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     dx_rem,angle_rem,topo_kappa,fac_kappa, &
 !$ACC     v_min,v_max,efoldc, &
-!$ACC     arc_extrusion_rate, &
+!$ACC     prod_magma, &
 !$ACC     bca(maxbc),bcb(maxbc),bcc(maxbc),xReyn, &
 !$ACC     bcd(maxbc),bce(maxbc),bcf(maxbc),bcg(maxbc),bch(maxbc),bci(maxbc), &
 !$ACC     dt_scale,strain_inert,vbc,frac, &
@@ -126,7 +126,7 @@ include 'precision.inc'
 !$ACC     t_top,t_bot,hs,hr,temp_per,bot_bc, &
 !$ACC     hc1(maxzone_age),hc2(maxzone_age),hc3(maxzone_age),hc4(maxzone_age), &
 !$ACC     age_1(maxzone_age),g,pisos,drosub,damp_vis, &
-!$ACC     width_mzone,chamber_max,ratio_crust_mzone,ratio_mantle_mzone, &
+!$ACC     width_mzone,fmagma_max,ratio_crust_mzone,ratio_mantle_mzone, &
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
