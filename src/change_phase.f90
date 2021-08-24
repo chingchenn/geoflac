@@ -142,7 +142,7 @@ do kk = 1 , nmarkers
                 exit
             endif
         enddo
-    case (kmant3)
+    !case (kmant3)
         ! dry mantle (depltetd mantle)
         ! future work : phase diagram ?
     case (kocean0, kocean1, kocean2)
