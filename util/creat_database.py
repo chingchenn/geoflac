@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jul 10 13:11:24 2021
-
 @author: jiching
 """
 import flac
@@ -124,25 +123,22 @@ def get_gravity(start=1,end_frame=end):
             time.append(fl.time[step])
     return dis,time,to,tom,fa,bg
 def get_magma(start_vts=1,model_steps=end-1):
-    tol_melt=np.zeros(end)
-    tol_chamber=np.zeros(end)
+    melt=np.zeros(end)
+    magma=np.zeros(end)
+    yymelt=np.zeros(end)
+    yychamber=np.zeros(end)
+    rrr=np.zeros(end)
     for i in range(1,end):
         x,z=fl.read_mesh(i)
         mm=fl.read_fmelt(i)
-        cc=fl.read_chamber(i)
-        mx,mz,mnum=f2.melt_element(x,z,i,mm)
-        cx,cz,cnum=f2.chamber_element(x,z,i,cc)
-        tol_melt[i]=0
-        tol_chamber[i]=0
-        for inn in range(len(mx)):
-            x,z=fl.read_mesh(end)
-            marea=f2.read_area(x,z,mx[inn],mz[inn])
-            carea=f2.read_area(x,z,cx[inn],cz[inn])
-            meltvol=marea * mnum[inn]
-            chambervol=marea * cnum[inn]
-            tol_melt[i] +=meltvol
-            tol_chamber[i] +=chambervol
-    return tol_melt,tol_chamber
+        chamber=fl.read_fmagma(i)
+        melt[i] = np.max(mm)
+        magma[i] = np.max(chamber)
+        if np.max(chamber) !=0:
+            rrr[i]=np.max(mm)/np.max(chamber)
+        yymelt[i]=(fl.read_fmelt(i)*fl.read_area(i)/1e6).sum()
+        yychamber[i]=(fl.read_fmagma(i)*fl.read_area(i)/1e6).sum()
+    return melt,magma,yymelt,yychamber,rrr
 magmafile=path+'data/magma_for_'+model+'.csv' 
 def count_marker(phase,start=1,end_frame=end):
     mr = np.zeros(end_frame-start)
@@ -188,9 +184,9 @@ if gravity:
 if magma:
     print('-----creat magma database-----')
     name='magma_for_'+model
-    tol_melt,tol_chamber=get_magma()      
-    fs.save_3array(name,savepath,time,tol_melt,tol_chamber,
-                   'time','fmelt','chamber')
+    melt,chamber,yymelt,yychamber,rrr=get_magma()      
+    fs.save_6array(name,savepath,time,melt,chamber,yymelt,yychamber,rrr,
+                   'time','fmelt','chamber','production','volume','ratio')
     print('=========== DONE =============')
 
 ##------------------------------------ plot -----------------------------------
@@ -211,18 +207,61 @@ if trench_plot:
 if magma_plot:
     name='magma_for_'+model
     df = pd.read_csv(path+'data/'+name+'.csv')
-    fig, (ax,ax2) = plt.subplots(2,1,figsize=(10,12))
-    ax.bar(df.time,df.fmelt,width=0.3,color='tomato',label='fmelt')
-    ax2.bar(df.time,df.chamber,width=0.3,color='orange',label='magma')
-    ax2.set_xlabel('Time (Myr)',fontsize=20)
-    ax.set_xlabel('Time (Myr)',fontsize=20)
-    ax.set_ylabel('melt',fontsize=20)
+    fig, (ax,ax2,ax3,ax4) = plt.subplots(4,1,figsize=(15,15))
+    ax.plot(df.time,df.production,color='tomato')
+    ax2.plot(df.time,df.volume,color='orange')
+    ax3.bar(df.time,df.fmelt,width=0.1,color='tomato',label='fmelt')
+    ax4.bar(df.time,df.chamber,width=0.1,color='orange',label='magma')
+    #ax.set_xlabel('Time (Myr)',fontsize=20)
+    #ax2.set_xlabel('Time (Myr)',fontsize=20)
+    #ax3.set_xlabel('Time (Myr)',fontsize=20)
+    ax4.set_xlabel('Time (Myr)',fontsize=20)
+    ax.set_ylabel('melt * area',fontsize=20)
+    ax2.set_ylabel('chamber *area',fontsize=20)
+    ax3.set_ylabel('max melt',fontsize=20)
+    ax4.set_ylabel('max magma fraction',fontsize=20)
+    #ax.set_ylim(0,0.8)
+    #ax2.set_ylim(0,10*1e-3)
+    #ax3.set_ylim(0,10*1e-3)
+    #ax4.set_ylim(0,3*1e-5)
+    ax.set_xlim(0,24)
+    ax2.set_xlim(0,24)
+    ax3.set_xlim(0,24)
+    ax4.set_xlim(0,24)
+    ax.grid()
+    ax2.grid()
+    ax3.grid()
+    ax4.grid()
     ax.tick_params(axis='x', labelsize=16 )
+    ax2.tick_params(axis='x', labelsize=16 )
+    ax3.tick_params(axis='x', labelsize=16 )
+    ax4.tick_params(axis='x', labelsize=16 )
     ax.tick_params(axis='y', labelsize=16 )
     ax2.tick_params(axis='y', labelsize=16 )
+    ax3.tick_params(axis='y', labelsize=16 )
+    ax4.tick_params(axis='y', labelsize=16 )
     ax.set_title('Model : '+model,fontsize=25)
-    ax2.set_ylabel('chamber',fontsize=20)
-    plt.savefig(figpath+model+'_magma.jpg')
+    fig.savefig(figpath+model+'_magma.png')
+#--------------------------------------------------------------------
+'''
+    fig2,(ax,ax2)=plt.subplots(1,2,figsize=(25,8))
+    cb_plot=ax.scatter(df.fmelt,df.chamber,c=df.time,cmap='rainbow')
+    ax_cbin =fig2.add_axes([0.13,0.78,0.23,0.03]) 
+    cb = fig2.colorbar(cb_plot,cax=ax_cbin,orientation='horizontal')
+    ax_cbin.set_title('Myr')
+    rrr1=f2.moving_window_smooth(df.ratio,10)
+    ax2.plot(df.time,rrr1,color='k',lw=3)
+    ax2.plot(df.time,df.ratio,color='gray',linestyle=':')
+    ax.set_ylim(0,max(df.chamber))
+    ax.set_xlim(0,max(df.fmelt))
+    ax.set_ylabel('max magma fraction')
+    ax.set_xlabel('max melt fraction')
+    ax2.set_xlabel('Myr')
+    ax2.set_ylim(0,max(df.ratio))
+    ax2.set_xlim(0,max(df.time))
+    fig2.savefig(figpath+model+'_ratio.png')
+'''
+#--------------------------------------------------------------------
 if marker_number != 0:
     mr = count_marker(marker_number)
     #plt.plot(mr,c='b')

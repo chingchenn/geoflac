@@ -8,8 +8,8 @@ matplotlib.use('Agg')
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import function_for_flac as f2
-model_list=['w0410','w0412','w0506','w0413','w0538','w0537','w0414','w0415','w0540','w0541','w0542','w0543']
-name_list=['50-5.5','60-5.5','70-5.5','80-5.5','50-6.5','55-6.5','60-6.5','70-6.5','55-7.5','60-7.5','70-7.5','80-7.5']
+model_list=['w0725','w0726']
+name_list=['no root ','root','80-7.5']
 rainbow = cm.get_cmap('rainbow',len(model_list))
 newcolors = rainbow(np.linspace(0, 1, len(model_list)))
 case =sys.argv[1]
@@ -21,6 +21,7 @@ if int(case)==2:
     fig, (ax,ax2)= plt.subplots(2,1,figsize=(10,10))
 for qq,model in enumerate(model_list):
     path = '/scratch2/jiching/'+model+'/'
+    path = '/home/jiching/geoflac/'+model+'/'
     os.chdir(path)
     fl = flac.Flac();end = fl.nrec
     nex = fl.nx - 1;nez = fl.nz - 1

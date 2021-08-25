@@ -26,17 +26,17 @@ def plot_gravity(frame,model):
     ax.tick_params(axis='x',labelsize=20)
     ax2.plot(px/1000,gb_gravity*10**5,lw=3,c='b',label='bouger')
     ax2.set_xlabel('Distance (km)',fontsize=40)
-    ax2.set_ylabel('Gravity Anomaly (mgal)',c='r',fontsize=30)
+    ax2.set_ylabel('Gravity Anomaly (mgal)',fontsize=30)
     ax.set_ylabel('height (m)',fontsize=30)
-    # ax2.set_ylim(-100,300)
-    ax.set_xlim(0,900)
+    ax2.set_ylim(-400,400)
+    ax.set_xlim(500,1200)
     ax.set_title(str(model)+'_frame-'+str(frame),fontsize=25)
     lines = [];labels = []
     for ax in fig.axes:
         axLine, axLabel = ax.get_legend_handles_labels()
         lines.extend(axLine)
         labels.extend(axLabel)
-    plt.savefig('/home/jiching/geoflac/'+str(model)+'_frame-'+str(frame)+'_gravity.jpg')
+    fig.savefig('/home/jiching/geoflac/'+str(model)+'_frame-'+str(frame)+'_gravity.jpg')
 
 if __name__ == '__main__':
     model = sys.argv[1]
