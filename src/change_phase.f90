@@ -17,7 +17,7 @@ double precision :: yy, dep2, depth, press, quad_area, &
 ! max. depth (m) of eclogite phase transition
 real*8, parameter :: max_basalt_depth = 150.d3
 ! min. temperature (C) of eclogite phase transition
-real*8, parameter :: min_eclogite_temp = 500.d0
+real*8, parameter :: min_eclogite_temp = 400.d0
 real*8, parameter :: min_eclogite_depth = 20d3
 real*8, parameter :: mantle_density = 3000.d0
 
@@ -145,12 +145,13 @@ do kk = 1 , nmarkers
     !case (kmant3)
         ! dry mantle (depltetd mantle)
         ! future work : phase diagram ?
-    case (kocean0, kocean1, kocean2)
+    case (kocean0, kocean1)
         ! basalt -> eclogite
         ! phase change pressure
         trpres = -0.3d9 + 2.2d6*tmpr
+        trpres2 = -0.0375d9 * tmpr +20.1d9
         press = mantle_density * g * depth
-        if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres) cycle
+        if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres .or. press < trpres2) cycle
         !$ACC atomic write
         !$OMP atomic write
         itmp(j,i) = 1
