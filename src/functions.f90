@@ -40,6 +40,7 @@ end function srateII
 !================================
 ! First invariant of stress (pressure)
 function stressI(iz,ix)
+!$ACC routine seq
 use arrays
 include 'precision.inc'
 

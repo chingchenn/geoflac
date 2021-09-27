@@ -227,7 +227,9 @@ subroutine sidewalltemp(i1, i2)
       n = nzone_age
   endif
 
-  if(iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3 ) then
+  if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
+            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
+            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
       !! Oceanic geotherm (half space cooling model)
       !$ACC parallel loop collapse(2) async(1)
       do i = i1, i2

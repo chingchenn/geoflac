@@ -149,6 +149,8 @@ do kk = 1 , nmarkers
         ! basalt -> eclogite
         ! phase change pressure
         trpres = -0.3d9 + 2.2d6*tmpr
+        ! Phase Diagram taken from Hacker, JGR, 2003 (Figure 8 or Figure 1)
+        ! Fixed points (400 C, 5.1 GPa) (536 C, 0 GPa)
         trpres2 = -0.0375d9 * tmpr +20.1d9
         press = mantle_density * g * depth
         if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres .or. press < trpres2) cycle
