@@ -115,6 +115,8 @@ call AdvanceToNextInputLine( 4 )
 read (4,*) t_bot  
 call AdvanceToNextInputLine( 4 )
 read (4,*) hs, hr 
+call AdvanceToNextInputLine( 4 )
+read (4,*) dth, cond1, cond2
 ! boundary conditions at the bottom (1-T,2-Flux) 
 call AdvanceToNextInputLine( 4 )
 read (4,*) itemp_bc, bot_bc

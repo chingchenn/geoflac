@@ -87,14 +87,14 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
      conduct(maxph),cp(maxph), &
      ts(maxph),tl(maxph),tk(maxph),fk(maxph), &
      ten_off,tau_heal,xinitaps(maxinh), &
-     t_top,t_bot,hs,hr,temp_per,bot_bc, &
+     t_top,t_bot,hs,hr,dth,cond1,cond2,temp_per,bot_bc, &
      hc1(maxzone_age),hc2(maxzone_age),hc3(maxzone_age),hc4(maxzone_age), &
      age_1(maxzone_age),g,pisos,drosub,damp_vis, &
      width_mzone,fmagma_max,ratio_crust_mzone,ratio_mantle_mzone, &
      lambda_freeze,lambda_freeze_tdep, &
      weaken_ratio_plastic,weaken_ratio_viscous, &
      dtavg,tbos, &
-     time,dt,time_max
+     time,dt,time_max, force_l, force_r
 
 !$ACC declare create(x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     dx_rem,angle_rem,topo_kappa,fac_kappa, &
@@ -114,14 +114,14 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     conduct(maxph),cp(maxph), &
 !$ACC     ts(maxph),tl(maxph),tk(maxph),fk(maxph), &
 !$ACC     ten_off,tau_heal,xinitaps(maxinh), &
-!$ACC     t_top,t_bot,hs,hr,temp_per,bot_bc, &
+!$ACC     t_top,t_bot,hs,hr,dth,cond1,cond2,temp_per,bot_bc, &
 !$ACC     hc1(maxzone_age),hc2(maxzone_age),hc3(maxzone_age),hc4(maxzone_age), &
 !$ACC     age_1(maxzone_age),g,pisos,drosub,damp_vis, &
 !$ACC     width_mzone,fmagma_max,ratio_crust_mzone,ratio_mantle_mzone, &
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
-!$ACC     time,dt,time_max)
+!$ACC     time,dt,time_max,force_l,force_r)
 
 character phasefile*20,tempfile*20,coordfile*20
 

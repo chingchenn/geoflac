@@ -34,9 +34,6 @@ case (2)
     cond_m = 3.3d0
     dens_c = 2700.d0
     dens_m = 3300.d0
-    cond1 = 20.0
-    cond2 = 6.0
-    depth = 45.0
     pi = 3.14159d0
     diffusivity = 1.d-6
     do n = 1, nzone_age
@@ -81,8 +78,8 @@ case (2)
                 do j = 1,nz
                     ! depth in km
                     y = (cord(1,i,2)-cord(j,i,2))*1.d-3
-                    if (y.gt.depth) then
-                          temp(j,i) = depth * cond1 + (y - depth) * cond2
+                    if (y.gt.dth) then
+                          temp(j,i) = dth * cond1 + (y - dth) * cond2
                     else
                           temp(j,i) = y * cond1
                     endif
@@ -202,16 +199,13 @@ subroutine sidewalltemp(i1, i2)
   ! This subroutine is intended for remeshing.
 
   integer, intent(in) :: i1, i2
-  double precision :: cond_c, cond_m, dens_c, dens_m, cond1, cond2, depth, pi, diffusivity, y
+  double precision :: cond_c, cond_m, dens_c, dens_m, pi, diffusivity, y
   integer :: n, i, j
   
   cond_c = 2.2d0
   cond_m = 3.3d0
   dens_c = 2700.d0
   dens_m = 3300.d0
-  cond1 = 20.0
-  cond2 =  6.0
-  depth = 45.0
   pi = 3.14159d0
   diffusivity = 1.d-6
 
@@ -254,8 +248,8 @@ subroutine sidewalltemp(i1, i2)
           do j = 1,nz
               ! depth in km
               y = (cord(1,i,2)-cord(j,i,2))*1.d-3
-              if (y.gt.depth) then
-                    temp(j,i) = depth * cond1 + (y - depth) * cond2
+              if (y.gt.dth) then
+                    temp(j,i) = dth * cond1 + (y - dth) * cond2
               else
                     temp(j,i) = y * cond1
               endif
