@@ -363,8 +363,10 @@ do i=1,nx
         endif
 
         ! VELOCITIES FROM FORCES
-        if( ncod(j,i,1) .eq. 1 ) then
-            vel(j,i,1) = bc(j,i,1) 
+        if( ncod(j,i,1) .eq. 1 .and. force_l.ge.-4.0d12 ) then
+            vel(j,i,1) = bc(j,i,1)
+        elseif( ncod(j,i,1) .eq. 1 .and. force_l.lt.-4.0d12 ) then
+            vel(j,i,1) = bc(j,i,1) * 0.8
         else
             vel(j,i,1) = vel(j,i,1) + dt*force(j,i,1)/(amass(j,i)*drat*drat)
         endif

@@ -10,7 +10,7 @@ use marker_data
 character*200 inputfile
 real*4 secnds,time0
 integer :: narg, iargc, j, irestart
-double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, force_l, force_r, sxxd, sxx ,stressI
+double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr
 
 narg = iargc()
 if(narg /= 1) then
@@ -77,26 +77,41 @@ do while( time .le. time_max )
   endif
 
  ! Forces at the boundaries
-  if( io_forc==1 .and. mod(nloop, 1000)==0) then
-      force_l=0.d0
-      force_r=0.d0
-      !$ACC wait (1)
-      !$ACC parallel loop reduction(+:force_l, force_r)
+  if( io_forc==1 .and. mod(nloop, 500)==0) then
+      fl=0.d0
+      fr=0.d0
+      !$ACC wait(1)
+      !$ACC parallel loop reduction(+:fl, fr)
       do j = 1,nz-1
           sxx = 0.25d0 * (stress0(j,1,1,1)+stress0(j,1,1,2)+stress0(j,1,1,3)+stress0(j,1,1,4) )
           sxxd = sxx-stressI(j,1)
           dl = cord(j+1,1,2)-cord(j,1,2)
-          force_l = force_l + sxxd*(-dl)
+          fl = fl + sxxd*(-dl)
 
           sxx = 0.25d0 * (stress0(j,nx-1,1,1)+stress0(j,nx-1,1,2)+stress0(j,nx-1,1,3)+stress0(j,nx-1,1,4))
           sxxd = sxx-stressI(j,nx-1)
           dl = cord(j+1,nx-1,2)-cord(j,nx-1,2)
-          force_r = force_r + sxxd*(-dl)
+          fr = fr + sxxd*(-dl)
       end do
-      open (1,file='forc.0',position='append')
-      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r
-      close (1)
+      force_l = fl
+      force_r = fr
+      !$ACC update self(force_l,force_r) async(1)
+      !open (1,file='forc.0',position='append')
+      !write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r, bn, bbc
+      !close (1)
   endif
+  !$ACC wait(1)
+  !$ACC parallel loop 
+  do j=1,nz-1
+      if (abs(force_l).gt.5.0d12) then
+         !$ACC atomic update
+         bc(j,1,1) = 0.8 * bc(j,1,1)
+      endif
+  end do
+  !$ACC end parallel
+  open (1,file='forc.0',position='append')
+  write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r
+  close (1)
 
   do j = 1, ntest_rem
     ! FLAC
