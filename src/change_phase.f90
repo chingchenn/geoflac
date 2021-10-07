@@ -162,8 +162,9 @@ do kk = 1 , nmarkers
         ! basalt -> eclogite
         ! phase change pressure
         trpres = -0.3d9 + 2.2d6*tmpr
+        trpres2 = -0.0375d9 * tmpr +20.1d9
         press = mantle_density * g * depth
-        if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres) cycle
+        if (tmpr < min_eclogite_temp .or. depth < min_eclogite_depth .or. press < trpres .or. press < trpres2) cycle
         !$ACC atomic write
         !$OMP atomic write
         itmp(j,i) = 1
