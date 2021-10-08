@@ -80,10 +80,9 @@ do while( time .le. time_max )
   if( io_forc==1 .and. mod(nloop, 500)==0) then
       fl=0.d0
       fr=0.d0
-      !$ACC wait(1)
-      !$ACC parallel loop reduction(+:fl, fr)
+      !$ACC parallel loop reduction(+:fl, fr) async(1)
       do j = 1,nz-1
-          sxx = 0.25d0 * (stress0(j,1,1,1)+stress0(j,1,1,2)+stress0(j,1,1,3)+stress0(j,1,1,4) )
+          sxx = 0.25d0 * (stress0(j,1,1,1)+stress0(j,1,1,2)+stress0(j,1,1,3)+stress0(j,1,1,4))
           sxxd = sxx-stressI(j,1)
           dl = cord(j+1,1,2)-cord(j,1,2)
           fl = fl + sxxd*(-dl)
@@ -93,22 +92,18 @@ do while( time .le. time_max )
           dl = cord(j+1,nx-1,2)-cord(j,nx-1,2)
           fr = fr + sxxd*(-dl)
       end do
+      !$ACC wait(1)
       force_l = fl
       force_r = fr
-      !$ACC update self(force_l,force_r) async(1)
-      !open (1,file='forc.0',position='append')
-      !write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r, bn, bbc
-      !close (1)
   endif
-  !$ACC wait(1)
-  !$ACC parallel loop 
-  do j=1,nz-1
-      if (abs(force_l).gt.5.0d12) then
-         !$ACC atomic update
-         bc(j,1,1) = 0.8 * bc(j,1,1)
-      endif
-  end do
-  !$ACC end parallel
+
+  if (abs(force_l).gt.7.0d12) then
+      !$ACC parallel loop async(1) 
+      do j=1,nz
+         bc(j,1,1) = 0.8d0 * bc(j,1,1)
+      end do
+      !$ACC end parallel
+  endif
   open (1,file='forc.0',position='append')
   write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r
   close (1)
