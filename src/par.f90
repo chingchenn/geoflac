@@ -9,8 +9,10 @@ use marker_data
 
 character*200 inputfile
 real*4 secnds,time0
-integer :: narg, iargc, j, irestart
-double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr
+integer :: narg, iargc, j, irestart, kk, fsave
+double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr, ringforce
+integer, parameter :: isize = 10
+real :: ring(isize)
 
 narg = iargc()
 if(narg /= 1) then
@@ -93,11 +95,26 @@ do while( time .le. time_max )
           fr = fr + sxxd*(-dl)
       end do
       !$ACC wait(1)
-      force_l = fl
-      force_r = fr
-  endif
+      force_l = (-fl)
+      force_r = (-fr)
 
-  if (abs(force_l).gt.7.0d12) then
+      fsave = nloop/500
+      if(fsave .le. isize) then
+          ring(fsave)=force_l
+          ringforce=(sum(ring(:)/fsave))
+      else
+          do kk=0,9
+              if (mod(fsave,isize)==kk) then
+                  ring(kk)=force_l
+                  ringforce=(sum(ring(:))/isize)
+                  exit
+              endif
+          end do
+      endif
+  endif
+ 
+
+  if (abs(ringforce).gt.7.0d12) then
       !$ACC parallel loop async(1) 
       do j=1,nz
          bc(j,1,1) = 0.8d0 * bc(j,1,1)
@@ -105,7 +122,7 @@ do while( time .le. time_max )
       !$ACC end parallel
   endif
   open (1,file='forc.0',position='append')
-  write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r
+  write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r,ringforce
   close (1)
 
   do j = 1, ntest_rem
