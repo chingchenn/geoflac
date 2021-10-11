@@ -10,8 +10,8 @@ use marker_data
 character*200 inputfile
 real*4 secnds,time0
 integer :: narg, iargc, j, irestart, kk, fsave
-double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr, ringforce, vl
-integer, parameter :: isize = 10
+double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr, ringforce, vl, vr, lstime
+integer, parameter :: isize = 20
 real :: ring(isize)
 
 narg = iargc()
@@ -79,17 +79,15 @@ do while( time .le. time_max )
   endif
 
  ! Forces at the boundaries
-  if( io_forc==1 .and. mod(nloop, 2000)==0) then
+  if( io_forc==1 .and. mod(nloop, 1000)==0) then
       fl=0.d0
       fr=0.d0
-      vl=0.d0
-      !$ACC parallel loop reduction(+:fl, fr, vl) async(1)
+      !$ACC parallel loop reduction(+:fl, fr) async(1)
       do j = 1,nz-1
           sxx = 0.25d0 * (stress0(j,1,1,1)+stress0(j,1,1,2)+stress0(j,1,1,3)+stress0(j,1,1,4))
           sxxd = sxx-stressI(j,1)
           dl = cord(j+1,1,2)-cord(j,1,2)
           fl = fl + sxxd*(-dl)
-          vl = vl + vel(j,1,1)
 
           sxx = 0.25d0 * (stress0(j,nx-1,1,1)+stress0(j,nx-1,1,2)+stress0(j,nx-1,1,3)+stress0(j,nx-1,1,4))
           sxxd = sxx-stressI(j,nx-1)
@@ -100,27 +98,30 @@ do while( time .le. time_max )
       force_l = (-fl)
       force_r = (-fr)  
       !$ACC update device(force_l,force_r) async(1)
-      fsave = nloop/2000
+      fsave = nloop/1000
+      !$ACC parallel loop async(1)
       do kk=1,isize
-          if (fsave.lt.5) then 
-              exit
-          endif
           if (mod(fsave,isize)==kk-1) then
               ring(kk)=force_l
               ringforce=(sum(ring(:))/isize)
               exit
           endif
       end do
+      !$ACC wait(1)
+      vl =  vel(1,1,1)
+      vr =  vel(1,nx,1)
       open (1,file='forc.0',position='append')
-      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,e10.3,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r,ringforce, vl
+      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r,ringforce, vl,vr
       close (1)
-  endif
-  if (abs(ringforce).gt.7.0d12) then
-      !$ACC parallel loop async(1) 
-      do j=1,nz
-         bc(j,1,1) = 0.9d0 * bc(j,1,1)
-      end do
-      !$ACC end parallel
+      lstime =  0.20d0
+      if (abs(ringforce).gt.7.5d12 .and. abs(lstime-time/sec_year/1.d6).gt.1d0 ) then
+          lstime = time/sec_year/1.d6
+          !$ACC parallel loop async(1) 
+          do j=1,nz
+             bc(j,1,1) = 0.9d0 * bc(j,1,1)
+             bc(j,nx,1) = 0.9d0 * bc(j,nx,1)
+          end do
+      endif
   endif
   do j = 1, ntest_rem
     ! FLAC
