@@ -9,8 +9,8 @@ use marker_data
 
 character*200 inputfile
 real*4 secnds,time0
-integer :: narg, iargc, j, irestart, kk, fsave
-double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr, ringforce, vl, vr, lstime
+integer :: narg, iargc, j, irestart, kk, fsave, lstime
+double precision :: dtacc_file, dtacc_save, dtacc_screen , dl, sxxd, sxx, stressI, fl, fr, ringforce, vl, vr
 integer, parameter :: isize = 20
 real :: ring(isize)
 
@@ -66,6 +66,7 @@ end if
 dtacc_screen = 0
 dtacc_file = 0
 dtacc_save = 0
+lstime =  500
 
 do while( time .le. time_max )
   if( dtout_screen .ne. 0 ) then
@@ -111,11 +112,10 @@ do while( time .le. time_max )
       vl =  vel(1,1,1)
       vr =  vel(1,nx,1)
       open (1,file='forc.0',position='append')
-      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3)') nloop, time/sec_year/1.d6, force_l, force_r,ringforce, vl,vr
+      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,i10)') nloop, time/sec_year/1.d6, force_l, force_r,ringforce, vl,vr, nloop-lstime
       close (1)
-      lstime =  0.20d0
-      if (abs(ringforce).gt.7.5d12 .and. abs(lstime-time/sec_year/1.d6).gt.1d0 ) then
-          lstime = time/sec_year/1.d6
+      if (abs(ringforce).gt.7d12 .and. (nloop-lstime).gt.5000 ) then
+          lstime = nloop
           !$ACC parallel loop async(1) 
           do j=1,nz
              bc(j,1,1) = 0.9d0 * bc(j,1,1)

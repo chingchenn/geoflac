@@ -34,7 +34,8 @@ subroutine itest_mesh(need_remeshing)
       if( need_remeshing .eq. 2 ) then
           if( dtout_screen .ne. 0 ) then
               print *, 'Remeshing due to shortening required: ', shortening
-              write(333,*) 'Remeshing due to shortening required: ', shortening
+              write(333,*) 'Remeshing due to shortening required: ',
+shortening,nloop
           else
               call SysMsg('TEST_MESH: Remeshing due to shortening required')
           endif
@@ -59,7 +60,7 @@ subroutine itest_mesh(need_remeshing)
       if( need_remeshing .eq. 3 ) then
           if( dtout_screen .ne. 0 ) then
               print *, 'Remeshing due to surface topo changes required: ', topochanges
-              write(333,*) 'Remeshing due to surface topo changes required: ', topochanges
+              write(333,*) 'Remeshing due to surface topo changes required: ', topochanges,nloop
           else
               call SysMsg('TEST_MESH: Remeshing due to surface topo changes required')
           endif
@@ -120,7 +121,7 @@ subroutine itest_mesh(need_remeshing)
     if( dtout_screen .ne. 0 ) then
         !$ACC wait(1)
         write (6,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year
-        write (333,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year
+        write (333,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year, 'loop=',nloop
         flush (333)
     endif
     ! check if the angle is smaller than angle of remeshing  
