@@ -6,6 +6,7 @@ program DREZINA
 use arrays
 use params
 use marker_data
+use nvtx_mod
 
 character*200 inputfile
 real*4 secnds,time0
@@ -42,7 +43,9 @@ goto 20
 20 continue
 
 if ( irestart .eq. 1 ) then  !file exists - restart
+    call nvtxStartRange('rsflac')
     call rsflac
+    call nvtxEndRange()
     if( dtout_screen .ne. 0 ) then
         write(6,*) 'you CONTINUE from  ', nloop, ' step'
     else
@@ -55,10 +58,14 @@ else ! file does not exist - new start
     else
         call SysMsg('you have NEW start conditions')
     endif
+    call nvtxStartRange('setflac')
     call setflac
+    call nvtxEndRange()
     ! Output of initial configuration
+    call nvtxStartRange('output')
     call outflac
     if (iint_marker.eq.1) call outmarker
+    call nvtxEndRange()
 end if
 
 
@@ -125,7 +132,9 @@ do while( time .le. time_max )
   endif
   do j = 1, ntest_rem
     ! FLAC
+    call nvtxStartRange('flac')
     call flac
+    call nvtxEndRange()
 
     nloop = nloop + 1
     time = time + dt
@@ -171,6 +180,7 @@ do while( time .le. time_max )
       dtacc_save = 0
     endif
   endif
+  call nvtxEndRange()
 
 end do
 
