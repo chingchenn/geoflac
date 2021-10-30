@@ -34,7 +34,7 @@ subroutine itest_mesh(need_remeshing)
       if( need_remeshing .eq. 2 ) then
           if( dtout_screen .ne. 0 ) then
               print *, 'Remeshing due to shortening required: ', shortening
-              write(333,*) 'Remeshing due to shortening required: ', shortening
+              write(333,*) 'Remeshing due to shortening required: ',shortening, nloop
           else
               call SysMsg('TEST_MESH: Remeshing due to shortening required')
           endif
@@ -59,7 +59,7 @@ subroutine itest_mesh(need_remeshing)
       if( need_remeshing .eq. 3 ) then
           if( dtout_screen .ne. 0 ) then
               print *, 'Remeshing due to surface topo changes required: ', topochanges
-              write(333,*) 'Remeshing due to surface topo changes required: ', topochanges
+              write(333,*) 'Remeshing due to surface topo changes required: ', topochanges,nloop
           else
               call SysMsg('TEST_MESH: Remeshing due to surface topo changes required')
           endif
@@ -127,7 +127,7 @@ subroutine itest_mesh(need_remeshing)
     if (anglemint .le. angle_rem) then
         if( dtout_screen .ne. 0 ) then
             print *, 'Remeshing due to angle required.'
-            write(333,*) 'Remeshing due to angle required.'
+            write(333,*) 'Remeshing due to angle required.',nloop
         else
             call SysMsg('TEST_MESH: Remeshing due to angle required.')
         endif
