@@ -2,6 +2,7 @@ subroutine remesh
 use arrays
 use params
 use marker_data
+use phases
 implicit none
 
 integer :: nzt,nxt
@@ -257,7 +258,7 @@ endif
 !!$! XXX: the bottom elements must be mantle material, otherwise
 !!$! too much deformation can occur(?)
 !!$aps(nz-3:nz-1, 1:nx-1) = 0.0d0
-!!$call newphase2marker(nz-3, nz-1, 1, nx-1, kmant1)
+call newphase2marker(nz-1, nz-1, 1, nx-1, kmant1)
 
 
 ! sources

@@ -34,8 +34,7 @@ subroutine itest_mesh(need_remeshing)
       if( need_remeshing .eq. 2 ) then
           if( dtout_screen .ne. 0 ) then
               print *, 'Remeshing due to shortening required: ', shortening
-              write(333,*) 'Remeshing due to shortening required: ',
-shortening,nloop
+              write(333,*) 'Remeshing due to shortening required: ',shortening, nloop
           else
               call SysMsg('TEST_MESH: Remeshing due to shortening required')
           endif
@@ -128,7 +127,7 @@ shortening,nloop
     if (anglemint .le. angle_rem) then
         if( dtout_screen .ne. 0 ) then
             print *, 'Remeshing due to angle required.'
-            write(333,*) 'Remeshing due to angle required.'
+            write(333,*) 'Remeshing due to angle required.',nloop
         else
             call SysMsg('TEST_MESH: Remeshing due to angle required.')
         endif
