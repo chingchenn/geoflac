@@ -111,10 +111,12 @@ do while( time .le. time_max )
       vl =  vel(1,1,1)
       vr =  vel(1,nx,1)
       open (1,file='forc.0',position='append')
-      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,i10)') nloop,time/sec_year/1.d6, force_l, force_r,ringforce, vl,vr, nloop-lstime
+      write (1,'(i10,1x,f7.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,e10.3,1x,i10,1x,e10.3)') nloop,time/sec_year/1.d6, force_l, force_r,ringforce, vl,vr, nloop-lstime, limit_force
       close (1)
-      if (abs(ringforce).gt.7.7d12 .and. abs(nloop-lstime).gt.10000 ) then
+      if ( itype_force==1 .and. abs(ringforce).gt.limit_force .and. abs(nloop-lstime).gt.10000 ) then
           lstime = nloop
+!          !ACC parallel async(1)
+!          dt_scale = dt_scale * 0.6
           !$ACC parallel loop async(1) 
           do j=1,nz
              bc(j,1,1) = 0.9d0 * bc(j,1,1)

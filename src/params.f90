@@ -14,7 +14,7 @@ real*8, parameter :: sec_year = 3.1558d+7  ! seconds in a year
 
 
 integer :: nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
-     ny_rem,mode_rem,ntest_rem,ivis_shape, &
+     ny_rem,mode_rem,ntest_rem,ivis_shape, itype_force, &
      itype_melting,nelem_serp,nmass_update,nopbmax,nydrsides,nystressbc, &
      nofbc,nofside(maxbc),nbc1(maxbc),nbc2(maxbc),nbc(maxbc), &
      mix_strain,mix_stress,lastsave,lastout, &
@@ -42,7 +42,7 @@ integer :: nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
      nloop,ifreq_avgsr,nsrate
 
 !$ACC declare create(nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
-!$ACC     ny_rem,mode_rem,ntest_rem,ivis_shape, &
+!$ACC     ny_rem,mode_rem,ntest_rem,ivis_shape, itype_force, &
 !$ACC     itype_melting,nelem_serp,nmass_update,nopbmax,nydrsides,nystressbc, &
 !$ACC     nofbc,nofside(maxbc),nbc1(maxbc),nbc2(maxbc),nbc(maxbc), &
 !$ACC     mix_strain,mix_stress,lastsave,lastout, &
@@ -94,7 +94,7 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
      lambda_freeze,lambda_freeze_tdep, &
      weaken_ratio_plastic,weaken_ratio_viscous, &
      dtavg,tbos, &
-     time,dt,time_max, force_l, force_r
+     time,dt,time_max, force_l, force_r, limit_force
 
 !$ACC declare create(x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     dx_rem,angle_rem,topo_kappa,fac_kappa, &
@@ -121,7 +121,7 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
-!$ACC     time,dt,time_max,force_l,force_r)
+!$ACC     time,dt,time_max,force_l,force_r, limit_force)
 
 character phasefile*20,tempfile*20,coordfile*20
 

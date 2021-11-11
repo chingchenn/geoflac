@@ -78,7 +78,7 @@ use params
 include 'precision.inc'
 
 !$ACC update device(nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
-!$ACC     ny_rem,mode_rem,ntest_rem,ivis_shape, &
+!$ACC     ny_rem,mode_rem,ntest_rem,ivis_shape, itype_force, &
 !$ACC     itype_melting,nelem_serp,nmass_update,nopbmax,nydrsides,nystressbc, &
 !$ACC     nofbc,nofside(maxbc),nbc1(maxbc),nbc2(maxbc),nbc(maxbc), &
 !$ACC     mix_strain,mix_stress,lastsave,lastout, &
@@ -130,5 +130,5 @@ include 'precision.inc'
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
-!$ACC     time,dt,time_max, force_l, force_r) async(1)
+!$ACC     time,dt,time_max, force_l, force_r, limit_force) async(1)
 end

@@ -120,7 +120,7 @@ subroutine itest_mesh(need_remeshing)
     if( dtout_screen .ne. 0 ) then
         !$ACC wait(1)
         write (6,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year
-        write (333,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year, 'loop=',nloop
+        write (333,'(A,F6.2,A,F10.6)') '        min.angle=',anglemint, '     dt(yr)=',dt/sec_year
         flush (333)
     endif
     ! check if the angle is smaller than angle of remeshing  
