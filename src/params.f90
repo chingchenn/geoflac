@@ -94,7 +94,7 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
      lambda_freeze,lambda_freeze_tdep, &
      weaken_ratio_plastic,weaken_ratio_viscous, &
      dtavg,tbos, &
-     time,dt,time_max, force_l, force_r, limit_force
+     time,dt,time_max, force_l, force_r, limit_force, decf, incf
 
 !$ACC declare create(x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     dx_rem,angle_rem,topo_kappa,fac_kappa, &
@@ -121,7 +121,7 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
-!$ACC     time,dt,time_max,force_l,force_r, limit_force)
+!$ACC     time,dt,time_max,force_l,force_r, limit_force, decf, incf)
 
 character phasefile*20,tempfile*20,coordfile*20
 

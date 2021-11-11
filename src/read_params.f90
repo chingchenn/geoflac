@@ -98,7 +98,7 @@ read(4,*) nyhydro,pisos,iphsub,drosub,damp_vis
 call AdvanceToNextInputLine( 4 )
 read(4,*) g
 call AdvanceToNextInputLine( 4 )
-read(4,*) itype_force, limit_force
+read(4,*) itype_force, limit_force,decf,incf
 
 
 

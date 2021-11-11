@@ -130,5 +130,5 @@ include 'precision.inc'
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &
 !$ACC     dtavg,tbos, &
-!$ACC     time,dt,time_max, force_l, force_r, limit_force) async(1)
+!$ACC     time,dt,time_max, force_l, force_r, limit_force,decf,incf) async(1)
 end

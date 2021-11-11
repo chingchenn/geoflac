@@ -119,16 +119,16 @@ do while( time .le. time_max )
 !          dt_scale = dt_scale * 0.6
           !$ACC parallel loop async(1) 
           do j=1,nz
-             bc(j,1,1) = 0.9d0 * bc(j,1,1)
-             bc(j,nx,1) = 0.9d0 * bc(j,nx,1)
+             bc(j,1,1) = decf * bc(j,1,1)
+             bc(j,nx,1) = decf * bc(j,nx,1)
           end do
       endif
       if (abs(nloop-lstime).gt.6000000) then 
           lstime = nloop
           !$ACC parallel loop async(1) 
           do j=1,nz
-             bc(j,1,1) = 1.1d0 * bc(j,1,1)
-             bc(j,nx,1) = 1.1d0 * bc(j,nx,1)
+             bc(j,1,1) = incf * bc(j,1,1)
+             bc(j,nx,1) = incf * bc(j,nx,1)
           end do
       endif
   endif
