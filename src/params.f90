@@ -87,9 +87,9 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
      conduct(maxph),cp(maxph), &
      ts(maxph),tl(maxph),tk(maxph),fk(maxph), &
      ten_off,tau_heal,xinitaps(maxinh), &
-     t_top,t_bot,hs,hr,dth,cond1,cond2,temp_per,bot_bc, &
+     t_top,t_bot,hs,hr,dth,cond1(maxzone_age),cond2(maxzone_age),temp_per,bot_bc, &
      hc1(maxzone_age),hc2(maxzone_age),hc3(maxzone_age),hc4(maxzone_age), &
-     age_1(maxzone_age),g,pisos,drosub,damp_vis, &
+     age_1(maxzone_age),g,pisos,drosub,damp_vis,thermal_type(maxzone_age), &
      width_mzone,fmagma_max,ratio_crust_mzone,ratio_mantle_mzone, &
      lambda_freeze,lambda_freeze_tdep, &
      weaken_ratio_plastic,weaken_ratio_viscous, &
@@ -114,9 +114,9 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     conduct(maxph),cp(maxph), &
 !$ACC     ts(maxph),tl(maxph),tk(maxph),fk(maxph), &
 !$ACC     ten_off,tau_heal,xinitaps(maxinh), &
-!$ACC     t_top,t_bot,hs,hr,dth,cond1,cond2,temp_per,bot_bc, &
+!$ACC     t_top,t_bot,hs,hr,dth,cond1(maxzone_age),cond2(maxzone_age),temp_per,bot_bc, &
 !$ACC     hc1(maxzone_age),hc2(maxzone_age),hc3(maxzone_age),hc4(maxzone_age), &
-!$ACC     age_1(maxzone_age),g,pisos,drosub,damp_vis, &
+!$ACC     age_1(maxzone_age),g,pisos,drosub,damp_vis,thermal_type(maxzone_age), &
 !$ACC     width_mzone,fmagma_max,ratio_crust_mzone,ratio_mantle_mzone, &
 !$ACC     lambda_freeze,lambda_freeze_tdep, &
 !$ACC     weaken_ratio_plastic,weaken_ratio_viscous, &

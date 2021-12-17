@@ -117,8 +117,8 @@ call AdvanceToNextInputLine( 4 )
 read (4,*) t_bot  
 call AdvanceToNextInputLine( 4 )
 read (4,*) hs, hr 
-call AdvanceToNextInputLine( 4 )
-read (4,*) dth, cond1, cond2
+!call AdvanceToNextInputLine( 4 )
+!read (4,*) dth, cond1, cond2
 ! boundary conditions at the bottom (1-T,2-Flux) 
 call AdvanceToNextInputLine( 4 )
 read (4,*) itemp_bc, bot_bc
@@ -148,8 +148,8 @@ call AdvanceToNextInputLine( 4 )
 read (4,*) nzone_age 
 call AdvanceToNextInputLine( 4 )
 do i = 1, nzone_age
-      read (4,*) age_1(i),hc1(i),hc2(i),hc3(i),hc4(i),iph_col1(i),iph_col2(i), &
-           iph_col3(i),iph_col4(i),iph_col5(i),ixtb1(i),ixtb2(i)
+      read (4,*) thermal_type(i),age_1(i),hc1(i),hc2(i),hc3(i),hc4(i),iph_col1(i),iph_col2(i), &
+           iph_col3(i),iph_col4(i),iph_col5(i),ixtb1(i),ixtb2(i),cond1(i),cond2(i)
 enddo
 ! check smooth nzone_age
 do i = 1, nzone_age-1

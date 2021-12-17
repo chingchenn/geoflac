@@ -41,10 +41,11 @@ case (2)
             if (iph_col_trans(n-1) == 1) cycle
         endif
 
-        if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
-            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
-            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
-            !! Oceanic geotherm (half space cooling model)
+        !if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
+        !    .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
+        !    .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
+        !! Oceanic geotherm (half space cooling model)
+        if (thermal_type(n)==1) then 
             do i = ixtb1(n), ixtb2(n)
                 age = age_1(n)
                 if (iph_col_trans(n) == 1) then
@@ -59,14 +60,14 @@ case (2)
                     !print *, j, age, -cord(j,i,2), temp(j,i)
                 enddo
             enddo
-        else
-            !! Continental geotherm
-!            tr= dens_c*hs*hr*hr*1.d+6/cond_c*exp(1.d0-exp(-hc3(n)/hr))
-!            q_m = (t_bot-t_top-tr)/((hc3(n)*1000.d0)/cond_c+((200.d3-(hc3(n))*1000.d0))/cond_m)
-!            tm  = t_top + (q_m/cond_c)*hc3(n)*1000.d0 + tr
-!            !   write(*,*) rzbo, tr, hs, hr, hc3(n), q_m, tm
-!            diff_m = cond_m/1000.d0/dens_m
-!            tau_d = 200.d3*200.d3/(pi*pi*diff_m)
+        elseif (thermal_type(n)==2) then
+            !! Continental geotherm origin
+            tr= dens_c*hs*hr*hr*1.d+6/cond_c*exp(1.d0-exp(-hc3(n)/hr))
+            q_m = (t_bot-t_top-tr)/((hc3(n)*1000.d0)/cond_c+((200.d3-(hc3(n))*1000.d0))/cond_m)
+            tm  = t_top + (q_m/cond_c)*hc3(n)*1000.d0 + tr
+            !   write(*,*) rzbo, tr, hs, hr, hc3(n), q_m, tm
+            diff_m = cond_m/1000.d0/dens_m
+            tau_d = 200.d3*200.d3/(pi*pi*diff_m)
             do i = ixtb1(n), ixtb2(n)
                 age = age_1(n)
                 if (iph_col_trans(n) == 1) then
@@ -78,27 +79,36 @@ case (2)
                 do j = 1,nz
                     ! depth in km
                     y = (cord(1,i,2)-cord(j,i,2))*1.d-3
-                    if (y.gt.dth) then
-                          temp(j,i) = dth * cond1 + (y - dth) * cond2
-                    else
-                          temp(j,i) = y * cond1
-                    endif
-!!$                    !  steady state part
-!!$                    if (y.le.hc3(n)) tss = t_top+(q_m/cond_c)*y*1000.d0+(dens_c*hs*hr*hr*1.d+6/cond_c)*exp(1.d0-exp(-y/hr))
-!!$                    if (y.gt.hc3(n)) tss = tm + (q_m/cond_m)*1000.d0*(y-hc3(n))
-!!$
-!!$                    ! time-dependent part
-!!$                    tt = 0.d0
-!!$                    pp =-1.d0
-!!$                    do k = 1,100
-!!$                        an = 1.d0*k
-!!$                        pp = -pp
-!!$                        tt = tt +pp/(an)*exp(-an*an*age_init/tau_d)*dsin(pi*k*(200.d3-y*1000.d0)/(200.d3))
-!!$                    enddo
-!!$                    temp(j,i) = tss +2.d0/pi*(t_bot-t_top)*tt
+                    !  steady state part
+                    if (y.le.hc3(n)) tss = t_top+(q_m/cond_c)*y*1000.d0+(dens_c*hs*hr*hr*1.d+6/cond_c)*exp(1.d0-exp(-y/hr))
+                    if (y.gt.hc3(n)) tss = tm + (q_m/cond_m)*1000.d0*(y-hc3(n))
+
+                    ! time-dependent part
+                    tt = 0.d0
+                    pp =-1.d0
+                    do k = 1,100
+                        an = 1.d0*k
+                        pp = -pp
+                        tt = tt +pp/(an)*exp(-an*an*age_init/tau_d)*dsin(pi*k*(200.d3-y*1000.d0)/(200.d3))
+                    enddo
+                    temp(j,i) = tss +2.d0/pi*(t_bot-t_top)*tt
                     if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
-!!$                    if (j.eq.1) temp(j,i) = t_top
-!!$                    !       write(*,*) tss,tm,q_m,cond_m,hc3(n),y,tt
+                    if (j.eq.1) temp(j,i) = t_top
+                    !       write(*,*) tss,tm,q_m,cond_m,hc3(n),y,tt
+                enddo
+            enddo
+        elseif (thermal_type(n)==3) then
+        !! Continental geotherm gradient
+            do i = ixtb1(n), ixtb2(n)
+                do j = 1,nz
+                    ! depth in km
+                    y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+                    if (y.gt.age_1(n)) then
+                        temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
+                    else
+                        temp(j,i) = y * cond1(n)
+                    endif
+                    if(temp(j,i).gt.1330.) temp(j,i)= 1330.d0
                 enddo
             enddo
         endif
@@ -199,8 +209,8 @@ subroutine sidewalltemp(i1, i2)
   ! This subroutine is intended for remeshing.
 
   integer, intent(in) :: i1, i2
-  double precision :: cond_c, cond_m, dens_c, dens_m, pi, diffusivity, y
-  integer :: n, i, j
+  double precision :: cond_c, cond_m, dens_c, dens_m, pi, diffusivity, y, tr,q_m,tm, age_init, diff_m, tau_d, tss, tt, pp, an
+  integer :: n, i, j, k
   
   cond_c = 2.2d0
   cond_m = 3.3d0
@@ -221,56 +231,65 @@ subroutine sidewalltemp(i1, i2)
       n = nzone_age
   endif
 
-  if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
-            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
-            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
+!  if(iph_col1(n)==kocean1 .or. iph_col1(n)==kocean2 .or. iph_col1(n)==kocean3 &
+!            .or. iph_col2(n)==kocean1 .or. iph_col2(n)==kocean2 .or. iph_col2(n)==kocean3 &
+!            .or. iph_col3(n)==kocean1 .or. iph_col3(n)==kocean2 .or. iph_col3(n)==kocean3) then
       !! Oceanic geotherm (half space cooling model)
-      !$ACC parallel loop collapse(2) async(1)
-      do i = i1, i2
-          do j = 1,nz
-              ! depth in km
-              y = (cord(1,i,2)-cord(j,i,2)) / sqrt(4 * diffusivity * age_1(n) * 1.d6 * sec_year)
-              temp(j,i) = t_top + (t_bot - t_top) * erf(y)
-              !print *, j, age_1(n), -cord(j,i,2), temp(j,i)
-          enddo
-      enddo
-  else
-      !! Continental geotherm
-!      tr= dens_c*hs*hr*hr*1.d+6/cond_c*exp(1.-exp(-hc3(n)/hr))
-!      q_m = (t_bot-t_top-tr)/((hc3(n)*1000.d0)/cond_c+((200.d3-(hc3(n))*1000.d0))/cond_m)
-!      tm  = t_top + (q_m/cond_c)*hc3(n)*1000.d0 + tr
-!      !   write(*,*) rzbo, tr, hs, hr, hc3(n), q_m, tm
-!      age_init = age_1(n)*3.14d0*1.d+7*1.d+6 + time
-!      diff_m = cond_m/1000.d0/dens_m
-!      tau_d = 200.d3*200.d3/(pi*pi*diff_m)
-!!$
-      do i = i1, i2
-          do j = 1,nz
-              ! depth in km
-              y = (cord(1,i,2)-cord(j,i,2))*1.d-3
-              if (y.gt.dth) then
-                    temp(j,i) = dth * cond1 + (y - dth) * cond2
-              else
-                    temp(j,i) = y * cond1
-              endif
-!!$              !  steady state part
-!!$              if (y.le.hc3(n)) tss = t_top+(q_m/cond_c)*y*1000.d0+(dens_c*hs*hr*hr*1.d+6/cond_c)*exp(1.d0-exp(-y/hr))
-!!$              if (y.gt.hc3(n)) tss = tm + (q_m/cond_m)*1000.d0*(y-hc3(n))
-!!$
-!!$              ! time-dependent part
-!!$              tt = 0.d0
-!!$              pp =-1.d0
-!!$              do k = 1,100
-!!$                  an = 1.d0*k
-!!$                  pp = -pp
-!!$                  tt = tt +pp/(an)*exp(-an*an*age_init/tau_d)*dsin(pi*k*(200.d3-y*1000.d0)/(200.d3))
-!!$              enddo
-!!$              temp(j,i) = tss +2.d0/pi*(t_bot-t_top)*tt
-              if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
-!!$              if (j.eq.1) temp(j,i) = t_top
-!!$              !       write(*,*) tss,tm,q_m,cond_m,hc3(n),y,tt
-          enddo
-      enddo
+  if (thermal_type(n)==1) then 
+     !$ACC parallel loop collapse(2) async(1)
+     do i = i1, i2
+         do j = 1,nz
+           ! depth in km
+           y = (cord(1,i,2)-cord(j,i,2)) / sqrt(4 * diffusivity * age_1(n) * 1.d6 * sec_year)
+           temp(j,i) = t_top + (t_bot - t_top) * erf(y)
+           !print *, j, age_1(n), -cord(j,i,2), temp(j,i)
+         enddo
+     enddo
+  elseif (thermal_type(n)==2) then
+     !! Continental geotherm
+     tr= dens_c*hs*hr*hr*1.d+6/cond_c*exp(1.-exp(-hc3(n)/hr))
+     q_m = (t_bot-t_top-tr)/((hc3(n)*1000.d0)/cond_c+((200.d3-(hc3(n))*1000.d0))/cond_m)
+     tm  = t_top + (q_m/cond_c)*hc3(n)*1000.d0 + tr
+     !   write(*,*) rzbo, tr, hs, hr, hc3(n), q_m, tm
+     age_init = age_1(n)*3.14d0*1.d+7*1.d+6 + time
+     diff_m = cond_m/1000.d0/dens_m
+     tau_d = 200.d3*200.d3/(pi*pi*diff_m)
+     do i = i1, i2
+         do j = 1,nz
+           ! depth in km
+           y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+           !  steady state part
+           if (y.le.hc3(n)) tss = t_top+(q_m/cond_c)*y*1000.d0+(dens_c*hs*hr*hr*1.d+6/cond_c)*exp(1.d0-exp(-y/hr))
+           if (y.gt.hc3(n)) tss = tm + (q_m/cond_m)*1000.d0*(y-hc3(n))
+            ! time-dependent part
+           tt = 0.d0
+           pp =-1.d0
+           do k = 1,100
+               an = 1.d0*k
+               pp = -pp
+               tt = tt +pp/(an)*exp(-an*an*age_init/tau_d)*dsin(pi*k*(200.d3-y*1000.d0)/(200.d3))
+           enddo
+           temp(j,i) = tss +2.d0/pi*(t_bot-t_top)*tt
+           if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
+           if (j.eq.1) temp(j,i) = t_top
+           !       write(*,*) tss,tm,q_m,cond_m,hc3(n),y,tt
+         enddo
+     enddo
+  elseif (thermal_type(n)==3) then
+   !! Continental geotherm gradient
+     !$ACC parallel loop collapse(2) async(1)
+     do i = ixtb1(n), ixtb2(n)
+         do j = 1,nz
+             ! depth in km
+             y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+             if (y.gt.age_1(n)) then
+                 temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
+             else
+                 temp(j,i) = y * cond1(n)
+             endif
+             if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
+         enddo
+     enddo
   endif
 
   if(i1 == 1) then
