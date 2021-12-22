@@ -101,7 +101,6 @@ case (2)
         !! Continental geotherm gradient
             do i = ixtb1(n), ixtb2(n)
                 do j = 1,nz
-                    ! depth in km
                     y = (cord(1,i,2)-cord(j,i,2))*1.d-3
                     if (y.gt.age_1(n)) then
                         temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
@@ -109,6 +108,20 @@ case (2)
                         temp(j,i) = y * cond1(n)
                     endif
                     if(temp(j,i).gt.1330.) temp(j,i)= 1330.d0
+                enddo
+            enddo
+        elseif (thermal_type(n)==4) then
+        !! Continental geotherm gradient
+            do i = ixtb1(n), ixtb2(n)
+                age = age_1(n)
+                if (iph_col_trans(n) == 1) then
+                    i1 = ixtb1(n)
+                    i2 = ixtb2(n)
+                    bot_dep = age_1(n) + (age_1(n+1) - age_1(n)) * (cord(1,i,1) - cord(1,i1,1)) / (cord(1,i2,1) - cord(1,i1,1))
+                endif
+                do j = 1,nz
+                    y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+                    temp(j,i) = y * (t_bot-t_top) / bot_dep
                 enddo
             enddo
         endif
@@ -209,7 +222,7 @@ subroutine sidewalltemp(i1, i2)
   ! This subroutine is intended for remeshing.
 
   integer, intent(in) :: i1, i2
-  double precision :: cond_c, cond_m, dens_c, dens_m, pi, diffusivity, y, tr,q_m,tm, age_init, diff_m, tau_d, tss, tt, pp, an
+  double precision :: cond_c, cond_m, dens_c, dens_m, pi, diffusivity, y, tr,q_m,tm, age_init, diff_m, tau_d, tss, tt, pp, an,age
   integer :: n, i, j, k
   
   cond_c = 2.2d0
@@ -280,14 +293,22 @@ subroutine sidewalltemp(i1, i2)
      !$ACC parallel loop collapse(2) async(1)
      do i = ixtb1(n), ixtb2(n)
          do j = 1,nz
-             ! depth in km
              y = (cord(1,i,2)-cord(j,i,2))*1.d-3
              if (y.gt.age_1(n)) then
                  temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
              else
                  temp(j,i) = y * cond1(n)
              endif
-             if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
+             if(temp(j,i).gt.1330) temp(j,i)= 1330.d0
+         enddo
+     enddo
+  elseif (thermal_type(n)==4) then
+   !! Continental geotherm gradient
+     !$ACC parallel loop collapse(2) async(1)
+     do i = ixtb1(n), ixtb2(n)
+         do j = 1,nz
+             y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+             temp(j,i) = y * (t_bot-t_top) / age_1(n)
          enddo
      enddo
   endif
