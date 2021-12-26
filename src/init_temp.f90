@@ -107,13 +107,13 @@ case (2)
                     else
                         temp(j,i) = y * cond1(n)
                     endif
-                    if(temp(j,i).gt.1330.) temp(j,i)= 1330.d0
+                    if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
                 enddo
             enddo
         elseif (thermal_type(n)==4) then
         !! Continental geotherm gradient
             do i = ixtb1(n), ixtb2(n)
-                age = age_1(n)
+                bot_dep = age_1(n)
                 if (iph_col_trans(n) == 1) then
                     i1 = ixtb1(n)
                     i2 = ixtb2(n)
@@ -122,6 +122,7 @@ case (2)
                 do j = 1,nz
                     y = (cord(1,i,2)-cord(j,i,2))*1.d-3
                     temp(j,i) = y * (t_bot-t_top) / bot_dep
+                    if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
                 enddo
             enddo
         endif
@@ -283,7 +284,7 @@ subroutine sidewalltemp(i1, i2)
                tt = tt +pp/(an)*exp(-an*an*age_init/tau_d)*dsin(pi*k*(200.d3-y*1000.d0)/(200.d3))
            enddo
            temp(j,i) = tss +2.d0/pi*(t_bot-t_top)*tt
-           if(temp(j,i).gt.1330.or.y.gt.200.d0) temp(j,i)= 1330.d0
+           if(temp(j,i).gt.1330) temp(j,i)= 1330.d0
            if (j.eq.1) temp(j,i) = t_top
            !       write(*,*) tss,tm,q_m,cond_m,hc3(n),y,tt
          enddo
@@ -299,7 +300,7 @@ subroutine sidewalltemp(i1, i2)
              else
                  temp(j,i) = y * cond1(n)
              endif
-             if(temp(j,i).gt.1330) temp(j,i)= 1330.d0
+             if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
          enddo
      enddo
   elseif (thermal_type(n)==4) then
@@ -309,6 +310,7 @@ subroutine sidewalltemp(i1, i2)
          do j = 1,nz
              y = (cord(1,i,2)-cord(j,i,2))*1.d-3
              temp(j,i) = y * (t_bot-t_top) / age_1(n)
+             if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
          enddo
      enddo
   endif
