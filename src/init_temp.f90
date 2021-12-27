@@ -292,7 +292,7 @@ subroutine sidewalltemp(i1, i2)
   elseif (thermal_type(n)==3) then
    !! Continental geotherm gradient
      !$ACC parallel loop collapse(2) async(1)
-     do i = ixtb1(n), ixtb2(n)
+     do i = i1, i2
          do j = 1,nz
              y = (cord(1,i,2)-cord(j,i,2))*1.d-3
              if (y.gt.age_1(n)) then
@@ -306,7 +306,7 @@ subroutine sidewalltemp(i1, i2)
   elseif (thermal_type(n)==4) then
    !! Continental geotherm gradient
      !$ACC parallel loop collapse(2) async(1)
-     do i = ixtb1(n), ixtb2(n)
+     do i = i1, i2
          do j = 1,nz
              y = (cord(1,i,2)-cord(j,i,2))*1.d-3
              temp(j,i) = y * (t_bot-t_top) / age_1(n)
