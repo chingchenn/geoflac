@@ -384,6 +384,9 @@ if (i_prestress.eq.1.and.time.lt.600.d3*sec_year) then
         do i = 1, nx
             vel(nz,i,k) = 0
         enddo
+     enddo
+     !$ACC parallel loop collapse(2) async(1)
+     do k = 1,2
         do j = 1, nz
             vel(j,1,k) = 0
             vel(j,nx,k) = 0
