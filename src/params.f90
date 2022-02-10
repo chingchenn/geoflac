@@ -7,7 +7,7 @@ integer, parameter :: maxtrzone = 20   ! max nzone_marker
 integer, parameter :: maxphasel = 20   ! max nphasl
 integer, parameter :: maxbc = 20   ! max # of bcs
 integer, parameter :: maxzone_age = 32   ! max # of nzone_age
-integer, parameter :: maxph = 20   ! max # of phases
+integer, parameter :: maxph = 25   ! max # of phases
 integer, parameter :: maxinh = 50   ! max # of inhomogeneities
 
 real*8, parameter :: sec_year = 3.1558d+7  ! seconds in a year
