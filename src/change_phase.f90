@@ -122,29 +122,41 @@ do kk = 1 , nmarkers
 
     case (kmant1,kmant2)
         ! subuducted oceanic crust below mantle, mantle is serpentinized
-        if(depth > max_basalt_depth) cycle
+        if(depth > max_basalt_depth+25) cycle
 
         ! Phase diagram taken from Ulmer and Trommsdorff, Nature, 1995
         ! Fixed points (730 C, 2.1 GPa) (500 C, 7.5 GPa)
         trpres = 2.1d9 + (7.5d9 - 2.1d9) * (tmpr - 730.d0) / (500.d0 - 730.d0)
-        ! Fixed points (730 C, 2.1 GPa) (650 C, 0.2 GPa)
-        trpres2 = 2.1d9 + (0.2d9 - 2.1d9) * (tmpr - 730.d0) / (650.d0 - 730.d0)
+        ! Fixed points (730 C, 2.1 GPa) (670 C, 0.6 GPa)
+        trpres2 = 2.1d9 + (0.6d9 - 2.1d9) * (tmpr - 730.d0) / (670.d0 - 730.d0)
         press = mantle_density * g * depth
         if (.not. (press < trpres .and. press > trpres2)) cycle
+        ! if temp>500 than serpentinized layer must < 3 km  Nadege Hilairet, Bruno Reynard, Tectonophysics 2009
+!        if (tmpr .lt. 500.d0) then 
         do jbelow = min(j+1,nz-1), min(j+nelem_serp,nz-1)
             if(phase_ratio(kocean1,jbelow,i) > 0.8d0 .or. &
-                phase_ratio(kocean2,jbelow,i) > 0.8d0 .or. &
-                phase_ratio(ksed1,jbelow,i) > 0.8d0) then
-                !$ACC atomic write
-                !$OMP atomic write
-                itmp(j,i) = 1
-                mark_phase(kk) = kserp
-                exit
-            endif
+               phase_ratio(kocean2,jbelow,i) > 0.8d0 .or. &
+               phase_ratio(ksed1,jbelow,i) > 0.8d0) then
+               !$ACC atomic write
+               !$OMP atomic write
+               itmp(j,i) = 1
+               mark_phase(kk) = kserp
+               exit
+             endif
         enddo
-    !case (kmant3)
-        ! dry mantle (depltetd mantle)
-        ! future work : phase diagram ?
+  !      else
+  !          do jbelow = min(j+1,nz-1), min(j+5,nz-1)
+  !              if(phase_ratio(kocean1,jbelow,i) > 0.8d0 .or. &
+  !                 phase_ratio(kocean2,jbelow,i) > 0.8d0 .or. &
+  !                phase_ratio(ksed1,jbelow,i) > 0.8d0) then
+  !                !$ACC atomic write
+  !                !$OMP atomic write
+  !                itmp(j,i) = 1
+  !                mark_phase(kk) = kserp
+  !                exit
+  !              endif
+  !          enddo
+  !      endif
     case (kocean0, kocean1)
         ! basalt -> eclogite
         ! phase change pressure
