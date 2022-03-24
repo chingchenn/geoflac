@@ -100,15 +100,33 @@ case (2)
         elseif (thermal_type(n)==3) then
         !! Continental geotherm gradient
             do i = ixtb1(n), ixtb2(n)
-                do j = 1,nz
-                    y = (cord(1,i,2)-cord(j,i,2))*1.d-3
-                    if (y.gt.age_1(n)) then
-                        temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
-                    else
-                        temp(j,i) = y * cond1(n)
-                    endif
-                    if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
-                enddo
+                if ((iph_col_trans(n) == 1) .and. (thermal_type(n+1) == 4))then
+                    i1 = ixtb1(n)
+                    i2 = ixtb2(n)
+                    do j = 1,nz
+                        y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+                        if (y.gt.age_1(n)) then
+                            temp(j,i1) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
+                        else
+                            temp(j,i1) = y * cond1(n)
+                        endif
+                        temp(j,i2) = y * (t_bot-t_top) / age_1(n)
+                        if(temp(j,i1).gt.1330.d0) temp(j,i1)= 1330.d0
+                        if(temp(j,i2).gt.1330.d0) temp(j,i2)= 1330.d0
+                        temp(j,i) =  temp(j,i1) + (temp(j,i2)-temp(j,i1)) * (cord(j,i,1) - cord(j,i1,1)) / (cord(j,i2,1) - cord(j,i1,1)) 
+                        if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
+                    enddo
+                else
+                    do j = 1,nz
+                        y = (cord(1,i,2)-cord(j,i,2))*1.d-3
+                        if (y.gt.age_1(n)) then
+                            temp(j,i) = age_1(n) * cond1(n) + (y - age_1(n)) * cond2(n)
+                        else
+                            temp(j,i) = y * cond1(n)
+                        endif
+                        if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
+                    enddo
+                endif
             enddo
         elseif (thermal_type(n)==4) then
         !! Continental geotherm gradient
