@@ -49,7 +49,11 @@ subroutine marker2elem
 
               call add_marker(xx, yy, iphase(j,i), 0.d0, j, i, inc)
               icount = icount + 1
-              if(icount > 100) stop 133
+              if(icount > 100) then
+!                  print *, kinc, nmarkers, r1, r2 
+!                  print *, cord(j:j+1, i:i+1, :)
+                  stop 133
+              endif
               if(inc.le.0) cycle
 
               kinc = kinc + 1
