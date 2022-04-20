@@ -12,7 +12,7 @@ integer :: jj, j, i, iph, &
            jbelow, k, kinc, kk, n
 double precision :: yy, dep2, depth, press, quad_area, &
                     tmpr, trtmpr, trpres, trpres2, &
-                    solidus, pmelt
+                    solidus, pmelt, pressure
 
 ! max. depth (m) of eclogite phase transition
 real*8, parameter :: max_basalt_depth = 150.d3
@@ -57,7 +57,7 @@ end do
 
 !$ACC wait(2)
 
-!$OMP parallel private(kk,i,j,k,n,tmpr,depth,iph,press,jbelow,trpres,trpres2,kinc,quad_area,yy)
+!$OMP parallel private(kk,i,j,k,n,tmpr,depth,iph,press,jbelow,trpres,trpres2,kinc,quad_area,yy, solidus)
 !$OMP do schedule(guided)
 !$ACC parallel loop async(1)
 do kk = 1 , nmarkers
@@ -204,7 +204,9 @@ do kk = 1 , nmarkers
     case (ksed1)
         ! dehydration, sedimentary rock -> schist
         ! from sediment solidus in Nichols et al., Nature, 1994
-        if (tmpr < 650d0 .or. depth < 20d3) cycle
+        solidus = max(680+0.6d-3*(depth-140d3), 930-313*(1-exp(-depth/7d3)))
+        if (tmpr < solidus) cycle
+!        if (tmpr < 650d0 .or. depth < 20d3) cycle
         !$ACC atomic write
         !$OMP atomic write
         itmp(j,i) = 1
@@ -259,7 +261,7 @@ if (itype_melting == 1) then
 
             ! sedimentary rock melting
             ! solidus from Nichols, 1994 Nature
-            if (phase_ratio(ksed1,j,i) > 0.1d0 .and. cord(j,i,2) > -200.d3) then
+            if (phase_ratio(ksed1,j,i) > 0.6d0 .and. cord(j,i,2) > -200.d3) then
                 tmpr = 0.25d0 * (temp(j,i)+temp(j,i+1)+temp(j+1,i)+temp(j+1,i+1))
 
                 ! depth below the surface in m
@@ -278,13 +280,49 @@ if (itype_melting == 1) then
         enddo
     enddo
     !$OMP end parallel do
+    !$OMP parallel do private(tmpr, yy, depth, solidus, pmelt,pressure)
+    !$ACC parallel loop collapse(2) async(1)
+    do i = 1, nx-1
+        do j = 1, nz-1
+
+            ! basalt and eclogite rock melting
+            ! solidus from Gutscher, 2000 Geology
+            if ((phase_ratio(kocean1,j,i)+phase_ratio(keclg,j,1)) > 0.6d0 .and. cord(j,i,2) > -200.d3) then
+                tmpr = 0.25d0 * (temp(j,i)+temp(j,i+1)+temp(j+1,i)+temp(j+1,i+1))
+
+                ! depth below the surface in m
+                yy = 0.25d0 * (cord(j,i,2)+cord(j,i+1,2)+cord(j+1,i,2)+cord(j+1,i+1,2))
+                depth = 0.5d0*(cord(1,i,2)+cord(1,i+1,2)) - yy
+                pressure = 3000*10*depth/1d9
+
+                !shaded area from Gutscher, 2000 Geology
+                if (pressure < 1d0) then
+                    solidus = 1050-420*(1-exp(-pressure*3.3))
+                elseif (pressure > 2.7d0) then
+                    solidus = (pressure+14)*43
+                else
+                    solidus=630+26*((-pressure)**2)/2
+                endif
+
+                if (tmpr > solidus) then
+                    ! fraction of partial melting
+                    ! XXX: assuming 10% of melting at solidus + 20 C
+                    pmelt = min((tmpr - solidus) / 20 * 0.1d0, 0.1d0)
+                    !$ACC atomic update
+                    !$OMP atomic update
+                    fmelt(j,i) = fmelt(j,i) + pmelt *(phase_ratio(kocean1,j,i)+phase_ratio(kmant2, j, i))
+                endif
+            endif
+        enddo
+    enddo
+    !$OMP end parallel do
 
     !$OMP parallel do private(tmpr, yy, depth, jj, solidus, pmelt)
     !$ACC parallel loop async(1)
     do i = 1, nx-1
         do j = nz-1, 1, -1
             ! flux melting in the mantel wedge occurs above serpertine or chlorite
-            if (phase_ratio(kserp,j,i) + phase_ratio(khydmant,j,i) > 0.8d0 .and. &
+            if (phase_ratio(kserp,j,i) + phase_ratio(khydmant,j,i) > 0.6d0 .and. &
                 cord(j,i,2) > -200.d3) then
 
                 ! search the mantle above for regions above solidus
