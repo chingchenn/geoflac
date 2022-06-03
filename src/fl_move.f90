@@ -332,7 +332,7 @@ subroutine resurface
       if (chgtopo * kinc >= elz .and. kinc .ne. max_markers_per_elem) then
             ! sedimentation, add a sediment marker
             !write(6,*) 'sediment', i, chgtopo, elz
-            call add_marker_at_top(i, 0.1d0, time, nloop, ksed2)
+            call add_marker_at_top(i, 0.1d0, time, nloop, ksed1)
 
             dhacc(i) = 0
             ichanged = 1
