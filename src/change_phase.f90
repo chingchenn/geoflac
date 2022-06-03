@@ -136,7 +136,7 @@ do kk = 1 , nmarkers
         do jbelow = min(j+1,nz-1), min(j+nelem_serp,nz-1)
             if(phase_ratio(kocean1,jbelow,i) > 0.8d0 .or. &
                phase_ratio(kocean2,jbelow,i) > 0.8d0 .or. &
-               phase_ratio(ksed1,jbelow,i) > 0.8d0) then
+               phase_ratio(ksed2,jbelow,i) > 0.8d0) then
                !$ACC atomic write
                !$OMP atomic write
                itmp(j,i) = 1
@@ -194,14 +194,14 @@ do kk = 1 , nmarkers
         !$OMP atomic write
         itmp(j,i) = 1
         mark_phase(kk) = kmant1
-    case (ksed2)
+    case (ksed1)
         ! compaction, uncosolidated sediment -> sedimentary rock
-        if (tmpr > 250d0 .and. depth < 7d3) cycle
+        if (depth < 30d3) cycle
         !$ACC atomic write
         !$OMP atomic write
         itmp(j,i) = 1
-        mark_phase(kk) = ksed1
-    case (ksed1)
+        mark_phase(kk) = ksed2
+    case (ksed2)
         ! dehydration, sedimentary rock -> schist
         ! from sediment solidus in Nichols et al., Nature, 1994
         solidus = max(680+0.6d-3*(depth-140d3), 930-313*(1-exp(-depth/7d3)))
@@ -261,7 +261,7 @@ if (itype_melting == 1) then
 
             ! sedimentary rock melting
             ! solidus from Nichols, 1994 Nature
-            if (phase_ratio(ksed1,j,i) > 0.6d0 .and. cord(j,i,2) > -200.d3) then
+            if (phase_ratio(ksed1,j,i) > 0.3d0 .and. cord(j,i,2) > -200.d3) then
                 tmpr = 0.25d0 * (temp(j,i)+temp(j,i+1)+temp(j+1,i)+temp(j+1,i+1))
 
                 ! depth below the surface in m
@@ -287,7 +287,7 @@ if (itype_melting == 1) then
 
             ! basalt and eclogite rock melting
             ! solidus from Gutscher, 2000 Geology
-            if ((phase_ratio(kocean1,j,i)+phase_ratio(keclg,j,1)) > 0.6d0 .and. cord(j,i,2) > -200.d3) then
+            if ((phase_ratio(kocean1,j,i)+phase_ratio(keclg,j,1)) > 0.3d0 .and. cord(j,i,2) > -200.d3) then
                 tmpr = 0.25d0 * (temp(j,i)+temp(j,i+1)+temp(j+1,i)+temp(j+1,i+1))
 
                 ! depth below the surface in m
@@ -308,8 +308,6 @@ if (itype_melting == 1) then
                     ! fraction of partial melting
                     ! XXX: assuming 10% of melting at solidus + 20 C
                     pmelt = min((tmpr - solidus) / 20 * 0.1d0, 0.1d0)
-                    !$ACC atomic update
-                    !$OMP atomic update
                     fmelt(j,i) = fmelt(j,i) + pmelt *(phase_ratio(kocean1,j,i)+phase_ratio(kmant2, j, i))
                 endif
             endif
@@ -322,7 +320,7 @@ if (itype_melting == 1) then
     do i = 1, nx-1
         do j = nz-1, 1, -1
             ! flux melting in the mantel wedge occurs above serpertine or chlorite
-            if (phase_ratio(kserp,j,i) + phase_ratio(khydmant,j,i) > 0.6d0 .and. &
+            if (phase_ratio(kserp,j,i) + phase_ratio(khydmant,j,i) > 0.8d0 .and. &
                 cord(j,i,2) > -200.d3) then
 
                 ! search the mantle above for regions above solidus
