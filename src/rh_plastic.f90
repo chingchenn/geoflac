@@ -290,12 +290,15 @@ do iph = 1, nphase
     psi = psi + phase_ratio(iph,j,i) * d
     hardn = hardn + phase_ratio(iph,j,i) * h
 
-    if (iph == karc1 .and. stressII(j,i) > 1d2) then
-        phi = phi * 0.2
-    endif
-    if (iph == kcont2 .and. stressII(j,i) > 1d2) then
-        phi = phi * 0.2
-    endif
+!    if (iph == karc1 .or. kcont2) then 
+!        if (stressII(j,i) < 5d2) then
+!            phi = phi
+!        elseif  (stressII(j,i) < 1d3) then
+!            phi = 0.01 * phi
+!        else 
+!            phi = phi * (1 -(stressII(j,i) - 5d2 * 0.198))
+!        endif
+!    endif
 enddo
 
 phi = 1 / phi
