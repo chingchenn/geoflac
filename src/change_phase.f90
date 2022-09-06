@@ -183,7 +183,7 @@ do kk = 1 , nmarkers
         mark_phase(kk) = keclg1
     case (kserp)
         ! dehydration, serpentinite -> hydrated mantle
-        ! Phase diagram taken from Ulmer and Trommsdorff, Nature, 1995
+        ! Phase diagram taken from Ulmer and Trommsdorff, Science, 1995
         ! Fixed points (730 C, 2.1 GPa) (500 C, 7.5 GPa)
         trpres = 2.1d9 + (7.5d9 - 2.1d9) * (tmpr - 730.d0) / (500.d0 - 730.d0)
         ! Fixed points (730 C, 2.1 GPa) (650 C, 0.2 GPa)
@@ -219,7 +219,7 @@ do kk = 1 , nmarkers
         !$ACC atomic write
         !$OMP atomic write
         itmp(j,i) = 1
-        mark_phase(kk) = kmant1
+        mark_phase(kk) = kmant2
     end select
 
 enddo
@@ -261,7 +261,7 @@ if (itype_melting == 1) then
 
             ! sedimentary rock melting
             ! solidus from Nichols, 1994 Nature
-            if (phase_ratio(ksed1,j,i) > 0.3d0 .and. cord(j,i,2) > -200.d3) then
+            if (phase_ratio(ksed1,j,i) > 0.3d0 .or. phase_ratio(ksed2,j,i) > 0.3d0  .and. cord(j,i,2) > -200.d3) then
                 tmpr = 0.25d0 * (temp(j,i)+temp(j,i+1)+temp(j+1,i)+temp(j+1,i+1))
 
                 ! depth below the surface in m
