@@ -113,7 +113,7 @@ case (2)
                         temp(j,i2) = y * (t_bot-t_top) / age_1(n)
                         if(temp(j,i1).gt.1330.d0) temp(j,i1)= 1330.d0
                         if(temp(j,i2).gt.1330.d0) temp(j,i2)= 1330.d0
-                        temp(j,i) =  temp(j,i1) + (temp(j,i2)-temp(j,i1)) * (cord(j,i,1) - cord(j,i1,1)) / (cord(j,i2,1) - cord(j,i1,1)) 
+                        !temp(j,i) =  temp(j,i1) + (temp(j,i2)-temp(j,i1)) * (cord(j,i,1) - cord(j,i1,1)) / (cord(j,i2,1) - cord(j,i1,1)) 
                         if(temp(j,i).gt.1330.d0) temp(j,i)= 1330.d0
                     enddo
                 else
