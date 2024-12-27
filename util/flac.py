@@ -150,6 +150,28 @@ class Flac(object):
         return exx, ezz, exz
 
 
+    def read_phase_melt(self,frame):
+        columns = 1
+        f = open('sedmelt.0')
+        offset = (frame-1) * columns * self.nelements * sizeoffloat
+        f.seek(offset)
+        fmelt_sed = self._read_data(f, columns, count=self.nelements)
+        self._reshape_elemental_fields(dmelt_sed)
+        
+        f = open('bsmelt.0')
+        offset = (frame-1) * columns * self.nelements * sizeoffloat
+        f.seek(offset)
+        fmelt_bs = self._read_data(f, columns, count=self.nelements)
+        self._reshape_elemental_fields(dmelt_bs)
+
+        f = open('pridmelt.0')
+        offset = (frame-1) * columns * self.nelements * sizeoffloat
+        f.seek(offset)
+        fmelt_prid = self._read_data(f, columns, count=self.nelements)
+        self._reshape_elemental_fields(dmelt_prid)
+        return fmelt_sed, fmelt_bs, fmelt_prid
+
+
     def read_eII(self, frame):
         columns = 1
         f = open('eII.0')
