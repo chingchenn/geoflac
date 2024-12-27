@@ -139,6 +139,34 @@ if( io_eII.eq.1 ) then
 
 endif
 
+! fmelt_phase melting phase
+do i = 1, nx-1
+    do j = 1, nz-1
+        De(j,i) = real(fmelt_phase(j,i,1))
+    end do
+end do
+open (1,file='sedmelt.0',access='direct',recl=nwords*kindr)
+write (1,rec=nrec) De
+close (1)
+
+do i = 1, nx-1
+    do j = 1, nz-1
+        De(j,i) = real(fmelt_phase(j,i,2))
+    end do
+end do
+open (1,file='bsmelt.0',access='direct',recl=nwords*kindr)
+write (1,rec=nrec) De
+close (1)
+
+do i = 1, nx-1
+    do j = 1, nz-1
+        De(j,i) = real(fmelt_phase(j,i,3))
+    end do
+end do
+open (1,file='pridmelt.0',access='direct',recl=nwords*kindr)
+write (1,rec=nrec) De
+close (1)
+
 ! Density
 if( io_density.eq.1 ) then
    do i = 1, nx-1
