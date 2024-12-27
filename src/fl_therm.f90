@@ -8,7 +8,7 @@ use arrays
 use params
 include 'precision.inc'
 
-double precision, parameter :: heat_latent_magma = 3.5d5  ! J/kg, latent heat of freezing magma
+double precision, parameter :: heat_latent_magma = 3.5d5  ! J/kg, latent heat of freezing magma Liu and Lowell, 2011
 double precision :: D(3,3)  ! diffusion operator
 
 ! real_area = 0.5* (1./area(n,t))
