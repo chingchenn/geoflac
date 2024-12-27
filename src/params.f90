@@ -38,7 +38,7 @@ integer :: nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
      movegrid,ndim,ifreq_visc,i_rey, &
      incoming_left,incoming_right, &
      iynts,iax1,iay1,ibx1,iby1,icx1,icy1,idx1,idy1, &
-     ivis_present,idt_scale,ifreq_imasses,ifreq_rmasses, &
+     ivis_present,n_boff_cutoff,idt_scale,ifreq_imasses,ifreq_rmasses, &
      nloop,ifreq_avgsr,nsrate
 
 !$ACC declare create(nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
@@ -66,7 +66,7 @@ integer :: nx,nz,nzonx,nzony,nelz_x(maxzone),nelz_y(maxzone), &
 !$ACC     movegrid,ndim,ifreq_visc,i_rey, &
 !$ACC     incoming_left,incoming_right, &
 !$ACC     iynts,iax1,iay1,ibx1,iby1,icx1,icy1,idx1,idy1, &
-!$ACC     ivis_present,idt_scale,ifreq_imasses,ifreq_rmasses, &
+!$ACC     ivis_present,n_boff_cutoff,idt_scale,ifreq_imasses,ifreq_rmasses, &
 !$ACC     nloop,ifreq_avgsr,nsrate)
 
 real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
@@ -75,9 +75,9 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
      prod_magma, &
      bca(maxbc),bcb(maxbc),bcc(maxbc),xReyn, &
      bcd(maxbc),bce(maxbc),bcf(maxbc),bcg(maxbc),bch(maxbc),bci(maxbc), &
-     dt_scale,strain_inert,vbc,frac, &
+     dt_scale,strain_inert,vbc,amul,ratl,ratu,frac, &
      dt_maxwell,fracm, &
-     dt_elastic,demf, &
+     dt_elastic,demf,boff, &
      dtout_screen,dtout_file,dtsave_file, &
      visc(maxph),den(maxph),alfa(maxph),beta(maxph),pln(maxph), &
      acoef(maxph),eactiv(maxph),rl(maxph),rm(maxph), &
@@ -102,9 +102,9 @@ real*8 :: x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
 !$ACC     prod_magma, &
 !$ACC     bca(maxbc),bcb(maxbc),bcc(maxbc),xReyn, &
 !$ACC     bcd(maxbc),bce(maxbc),bcf(maxbc),bcg(maxbc),bch(maxbc),bci(maxbc), &
-!$ACC     dt_scale,strain_inert,vbc,frac, &
+!$ACC     dt_scale,strain_inert,vbc,amul,ratl,ratu,frac, &
 !$ACC     dt_maxwell,fracm, &
-!$ACC     dt_elastic,demf, &
+!$ACC     dt_elastic,demf,boff, &
 !$ACC     dtout_screen,dtout_file,dtsave_file, &
 !$ACC     visc(maxph),den(maxph),alfa(maxph),beta(maxph),pln(maxph), &
 !$ACC     acoef(maxph),eactiv(maxph),rl(maxph),rm(maxph), &

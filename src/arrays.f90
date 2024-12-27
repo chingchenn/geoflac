@@ -7,7 +7,7 @@ module arrays
 
   ! fortran array allocatable
   double precision, allocatable:: cord(:,:,:), temp(:,:), vel(:,:,:), stress0(:,:,:,:), &
-       force(:,:,:), amass(:,:), rmass(:,:), &
+       force(:,:,:), balance(:,:,:), amass(:,:), rmass(:,:), &
        area(:,:,:), dvol(:,:,:), strain(:,:,:), bc(:,:,:), fmelt_phase(:,:,:)
 
   integer, allocatable :: ncod(:,:,:), iphase(:,:), &
@@ -46,6 +46,7 @@ contains
     allocate(vel(nz, nx, 2))
     allocate(stress0(nz-1, nx-1, 4, ntri))
     allocate(force(nz, nx, 2))
+    allocate(balance(nz, nx, 2))
     allocate(amass(nz, nx))
     allocate(rmass(nz, nx))
     allocate(area(nz-1, nx-1, ntri))

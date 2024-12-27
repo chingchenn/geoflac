@@ -287,8 +287,13 @@ if (mod(ntest_rem, ifreq_rmasses) + mod(ntest_rem, ifreq_imasses) &
         stop
 endif
 
+! acceleration parameters
+call AdvanceToNextInputLine( 4 )
+read(4,*) amul, ratl, ratu
 call AdvanceToNextInputLine( 4 )
 read(4,*) frac, fracm
+call AdvanceToNextInputLine( 4 )
+read(4,*) n_boff_cutoff
 call AdvanceToNextInputLine( 4 )
 read(4,*) movegrid,ndim
 call AdvanceToNextInputLine( 4 )

@@ -102,7 +102,7 @@ include 'precision.inc'
 !$ACC     movegrid,ndim,ifreq_visc,i_rey, &
 !$ACC     incoming_left,incoming_right, &
 !$ACC     iynts,iax1,iay1,ibx1,iby1,icx1,icy1,idx1,idy1, &
-!$ACC     ivis_present,idt_scale,ifreq_imasses,ifreq_rmasses, &
+!$ACC     ivis_present,n_boff_cutoff,idt_scale,ifreq_imasses,ifreq_rmasses, &
 !$ACC     nloop,ifreq_avgsr,nsrate) async(1)
 
 !$ACC update device(x0,z0,rxbo,rzbo,sizez_x(maxzone),sizez_y(maxzone), &
@@ -111,7 +111,7 @@ include 'precision.inc'
 !$ACC     prod_magma, &
 !$ACC     bca(maxbc),bcb(maxbc),bcc(maxbc),xReyn, &
 !$ACC     bcd(maxbc),bce(maxbc),bcf(maxbc),bcg(maxbc),bch(maxbc),bci(maxbc), &
-!$ACC     dt_scale,strain_inert,vbc,frac, &
+!$ACC     dt_scale,strain_inert,vbc,amul,ratl,ratu,frac, &
 !$ACC     dt_maxwell,fracm, &
 !$ACC     dt_elastic,demf, &
 !$ACC     dtout_screen,dtout_file,dtsave_file, &

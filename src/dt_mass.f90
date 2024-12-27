@@ -25,7 +25,7 @@ double precision, parameter :: c1d12 = 1.d0/12.d0
 integer i, j, k, iph, iblk, jblk
 double precision :: dlmin, dtmax_therm, vel_max, dt_m, diff, Eff_cp, Eff_conduct
 double precision :: pwave, dens, vel_sound, rho_inert, rho_inert2, am3, dte, dtt
-double precision :: rmu, visc_cut
+double precision :: rmu, visc_cut, dt_min
 
 ! minimal propagation distance
 dlmin = dlmin_prop()
@@ -153,7 +153,17 @@ do iblk = 1, 2
 enddo
 
 !$ACC update self(dt_elastic, dt_maxwell) async(1)
-dt = min(min(dt_elastic, dt_maxwell), dtmax_therm)
+!$ACC wait (1)
+dt_min = min(min(dt_elastic, dt_maxwell), dtmax_therm)
+if ( boff .lt. ratl ) then
+    ! Increase the time step
+    dt = dt * amul
+elseif ( boff .gt. ratu ) then
+    ! decrease time step
+    dt = dt / amul
+endif
+
+dt = max (dt, dt_min )
 !$ACC update device(dt) async(1)
 return
 end

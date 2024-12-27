@@ -17,6 +17,7 @@ subroutine bc_update
   ! -------------------------------------------------------------
   !$ACC kernels async(1)
   force = 0.0d0
+  balance = 0.0d0
   !$ACC end kernels
 
   if (nydrsides.eq. 1) then
@@ -44,6 +45,9 @@ subroutine bc_update
           !           projection on y
           force(j,1,2) = force(j,1,2)-0.5d0*press_norm*dlx
           force(j+1,1,2) = force(j+1,1,2)-0.5d0*press_norm*dlx
+          
+          balance(j,1,1) = 1.d+17
+          balance(j+1,1,1) = 1.d+17
 
           rogh = rogh +dP
       enddo
@@ -77,6 +81,9 @@ subroutine bc_update
           !           projection on y
           force(j,nx,2) = force(j,nx,2)+0.5d0*press_norm*dlx
           force(j+1,nx,2) = force(j+1,nx,2)+0.5d0*press_norm*dlx
+
+          balance(j,nx,1) = 1.d+17
+          balance(j+1,nx,1) = 1.d+17
 
           rogh = rogh +dP
       enddo
@@ -113,6 +120,10 @@ subroutine bc_update
       !$ACC atomic update
       force(jj2,ii2,2) = force(jj2,ii2,2)+0.5d0*s_normal*dlx
       !       write(*,*) jj1,jj2,ii1,ii2,s_normal,force(jj1,ii1,1), force(jj2,ii2,1)
+      !$ACC atomic update
+      balance(jj1,ii1,1) = 1.d+17
+      !$ACC atomic update
+      balance(jj2,ii2,1) = 1.d+17
       !
       ! Shear component
       !
@@ -129,12 +140,18 @@ subroutine bc_update
       !$ACC atomic update
       force(jj2,ii2,2) = force(jj2,ii2,2)+0.5d0*s_shear*dly
 
+      !$ACC atomic update
+      balance(jj1,ii1,2) = 1.d+17
+      !$ACC atomic update
+      balance(jj2,ii2,2) = 1.d+17
 
       !       if (i_sl.eq.1) then
       !       s_shearo  = bcstress(i,3)
       !           projection on x
       !       force(nn1,3) = force(nn1,3)+0.5d0*s_shearo*dlx
       !       force(nn2,3) = force(nn2,3)+0.5d0*s_shearo*dlx
+      !       balance(nn1,3) = 1.d+17
+      !       balance(nn2,3) = 1.d+17
       !       write(*,*) bcstress(i,3)
       !       endif
   enddo
